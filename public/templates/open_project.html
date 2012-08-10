@@ -1,0 +1,30 @@
+<div class="modal hide " id="open_project_form">
+          <div class="modal-header">
+            <a class="close" data-dismiss="modal">×</a>
+            <h3>Open Project</h3>
+          </div>
+          <div class="modal-body">
+            <form class='form-horizontal'>
+              
+              <label class='control-label es_label'>Title: </label>
+              <div class='controls es_control'>
+                <select name='projectName' id='projectName' class='es_combo'>
+                  
+                  <%for (var i=0; i < data.length; i++){%>
+                    <% var title = data[i].title; %>
+                    <option value='<%= title %>'> 
+                      <%= title %>
+                    </option>
+                  <%}%>
+                  
+                </select>
+              </div>
+            
+            </form>
+            
+          </div>
+          <div class="modal-footer">
+            <a href="#" id='btn_project_open' class="btn btn-primary">Open</a>
+            <a href="#"  data-dismiss="modal" class="btn btn-primary">Cancel</a>
+          </div>
+      </div>
