@@ -40,6 +40,18 @@ app.register('.html', {
     }
 });
 
+function test(){
+  var path = "./projects/Some Project/input/build.js";
+  var fs = require("fs");
+  fs.readFile(path, 'utf8', function(err, data){
+    console.log(data)
+    var build = JSON.parse(data)
+    console.log(build["newFiles"])
+  });
+}
+
+test()
+
 //Routes
 app.get('/', routes.index);
 app.get('/template', routes.getTemplate);

@@ -5,7 +5,7 @@
     var ExtGen;
     ExtGen = {};
     ExtGen.init = function(code, configuration) {
-      var config, editViewFields, gridViewFields, item, modelFields, name, names, namespace, output, raw, ref, references, result, somevar, _fields, _label, _name;
+      var config, editViewFields, gridViewFields, info, item, modelFields, name, names, namespace, output, raw, ref, references, result, somevar, _fields, _label, _name;
       this.outCode = {
         model: "",
         store: "",
@@ -15,7 +15,11 @@
       };
       window.config = configuration;
       if (!(configuration != null)) {
-        mediator.publish("app_notify", "A configuration file does not exist. Please make sure one exists");
+        info = {
+          message: "A configuration file does not exist. Please make sure one exists",
+          status: "error"
+        };
+        mediator.publish("app_notify", info);
         return;
       }
       somevar = ((function() {
@@ -26,7 +30,11 @@
         }
       })());
       if (!typeof somevar === "object") {
-        mediator.publish("app_notify", somevar);
+        info = {
+          message: somevar,
+          status: "error"
+        };
+        mediator.publish("app_notify", info);
       }
       somevar = ((function() {
         try {
@@ -36,7 +44,11 @@
         }
       })());
       if (!typeof somevar === "object") {
-        mediator.publish("app_notify", somevar);
+        info = {
+          message: somevar,
+          status: "error"
+        };
+        mediator.publish("app_notify", info);
       }
       editViewFields = [];
       gridViewFields = [];
@@ -44,12 +56,20 @@
       _fields = [];
       result = this.verify(raw);
       if (!result.success) {
-        mediator.publish("app_notify", result.message);
+        info = {
+          message: result.message,
+          status: "error"
+        };
+        mediator.publish("app_notify", info);
         return false;
       }
       result = this.verify(config, "config");
       if (!result.success) {
-        mediator.publish("app_notify", result.message);
+        info = {
+          message: result.message,
+          status: "error"
+        };
+        mediator.publish("app_notify", info);
         return false;
       }
       /*

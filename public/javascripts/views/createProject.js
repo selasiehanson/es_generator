@@ -45,7 +45,8 @@ define(['jquery','underscore','backbone','models/project',
 							mediator.publish("openProject",res.data[0]["projectName"])
 							self.opened = true;
 						}else {
-							mediator.publish("app_notify", res.message);
+							var info = {message : res.message, status : "error"}
+							mediator.publish("app_notify", info);
 						}
 					}
 				});		

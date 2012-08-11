@@ -15,8 +15,8 @@ define(['modules/facade','views/createFile',
 		var self = this;
 
 		facade.subscribe("app_init", function (context){
-			console.log("Appplication started successfully");
-			console.log(context);
+			var info = {message : "Appplication started successfully", status : 'success'}
+			mediator.publish("app_notify",info);
 		});
 
 		facade.subscribe("app_init", function (context){
@@ -51,6 +51,8 @@ define(['modules/facade','views/createFile',
 				type : 'get',
 				success : function (res){
 					mediator.publish("projectOpening", res.data[0]);
+					var info = {message : data["message"], status : "success" };
+					mediator.publish("app_notify", info);
 				}
 			});
 		});
@@ -58,6 +60,8 @@ define(['modules/facade','views/createFile',
 
 		facade.subscribe("projectOpening", function (data){
 			//resolve paths here
+			var info = {message : "Attempting to open project" };
+			mediator.publish("app_notify", info);
 			settings.solutionOpened = true;
 			settings.path = settings.currentProject = data.projectName;
 			var out = {
@@ -81,6 +85,9 @@ define(['modules/facade','views/createFile',
 
 		facade.subscribe("projectOpeningFinished",function(data){
 			console.log("project opening finished")
+			var message = data["projectName"] +" Opened successfully."
+			var info = {message : message, status : "success" };
+			mediator.publish("app_notify", info);
 		})
 
 		var processDirs = function(out,objectMap,counter,path) {
@@ -184,11 +191,13 @@ define(['modules/facade','views/createFile',
 						}
 					});
 				} else {
-					alert("No file Opened");
+					var info = {message : "No file Opened", status : "error"}
+					mediator.publish("app_notify",info);
 				}
 				
 			}else {
-				alert("There is no solution currently opened");
+				var info = {message : "There is no solution currently opened", status : "error" }
+				mediator.publish("app_notify",info);
 			}
 		});
 
@@ -203,7 +212,8 @@ define(['modules/facade','views/createFile',
 			$.get('/file',attr,function(res){
 				console.log(res)
 				if (!res.success){
-					mediator.publish("app_notify","File not found");
+					var info = {message : "File not found" , status : "error"}
+					mediator.publish("app_notify",info);
 				}else {
 					var configuration = res["data"][0];
 					if( _gen.init(code,configuration)){
@@ -215,7 +225,7 @@ define(['modules/facade','views/createFile',
 			
 		});
 
-		facade.subscribe("app_notify", function (message){
-			alert(message);
+		facade.subscribe("app_notify", function (packet){
+			mediator.publish("notify",packet);
 		});
 });

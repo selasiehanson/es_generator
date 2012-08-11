@@ -11,7 +11,10 @@ define ["jquery", "underscore","modules/helper",'modules/mediator'], ($,_,helper
 
 		window.config =  configuration
 		if not configuration?
-			mediator.publish("app_notify","A configuration file does not exist. Please make sure one exists")
+			info  = 
+				message : "A configuration file does not exist. Please make sure one exists"
+				status : "error"
+			mediator.publish("app_notify",info)
 			return
 
 		somevar = (
@@ -22,7 +25,10 @@ define ["jquery", "underscore","modules/helper",'modules/mediator'], ($,_,helper
 			)
 		
 		if not typeof somevar is "object"
-			mediator.publish("app_notify",somevar) 
+			info = 
+				message : somevar
+				status : "error"
+			mediator.publish("app_notify",info) 
 
 		somevar = (
 			try
@@ -33,7 +39,10 @@ define ["jquery", "underscore","modules/helper",'modules/mediator'], ($,_,helper
 			)
 
 		if not typeof somevar is "object"
-			mediator.publish("app_notify",somevar) 
+			info = 
+				message : somevar
+				status : "error"
+			mediator.publish("app_notify",info) 
 		
 		
 		editViewFields = []
@@ -43,13 +52,19 @@ define ["jquery", "underscore","modules/helper",'modules/mediator'], ($,_,helper
 
 		result = @verify(raw)
 		if not result.success
-			mediator.publish("app_notify",result.message)
+			info = 
+				message : result.message
+				status : "error"
+			mediator.publish("app_notify",info)
 			return false
 		
 
 		result  = @verify(config, "config")
 		if not result.success
-			mediator.publish("app_notify",result.message)	
+			info = 
+				message : result.message
+				status : "error"
+			mediator.publish("app_notify",info)	
 			return false
 
 		###
