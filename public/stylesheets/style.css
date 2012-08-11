@@ -136,6 +136,9 @@ a {
 
 }
 
+.folder:hover {
+    text-decoration: none;
+}
 .cust-tree li a:hover { 
 	text-decoration : none ;
 }

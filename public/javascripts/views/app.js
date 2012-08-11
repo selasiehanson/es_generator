@@ -23,6 +23,10 @@ define(["jquery",'underscore','backbone',
 				this.solutionPane =  new SolutionPane;
 				this.templatePane = new TemplatePane;
 				mediator.publish("app_init",this);
+
+				$('.tooltip-demo.well').tooltip({
+			      selector: "a[rel=tooltip]"
+			    })
 			}
 		});
 	

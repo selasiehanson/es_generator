@@ -140,7 +140,7 @@ define(['modules/facade','views/createFile',
 			file.save({},{
 				success : function (model , res){
 					mediator.publish("fileCreated",res); 
-					mediator.publish("projectOpening", res.data[0]);
+					mediator.publish("openProject", res.data[0]["projectName"]);
 					context.form.modal('hide');
 				}
 			});

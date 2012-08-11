@@ -42,7 +42,7 @@ exports.createProject = function (req, res) {
 			
 			predefinedFiles.forEach(function (item){
 				fs.writeFile(inputPath+"/" + item["file"] , item["definition"]);
-			})	 		
+			});	 		
 
 			switch(type) {
 				case "extjs" :
@@ -137,14 +137,18 @@ exports.createFile =  function  (req, res){
 					message = "file successfully created";
 					success =  true;
 					
-					var d = projectFolder + project;
-					getFolderContents(d, function (output){
-						var data = {
-							projectName : project,
-							folders : output
-						}
-						res.send({success : success, message : message , data : [data]});
-					});
+					var d = {
+						projectName :  projectFolder + project 
+					}
+
+					res.send({success : success, message : message , data : [d]});
+					// getFolderContents(d, function (output){
+					// 	var data = {
+					// 		projectName : project,
+					// 		folders : output
+					// 	}
+					// 	res.send({success : success, message : message , data : [data]});
+					// });
 
 				}else {
 					console.log(err);

@@ -17,7 +17,11 @@ define(['jquery','underscore','backbone',
 		initialize : function (){
 			//console.log(this);
 			$("#t_save_file").click(this.saveFile);
-			$("#t_run_file").click(this.runFile)
+			$("#t_run_file").click(this.runFile);
+
+			$('.mytooltip').tooltip({
+				placement : 'bottom'
+			});
 		},
 		render : function () {
 
