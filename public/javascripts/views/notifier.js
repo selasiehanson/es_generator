@@ -12,7 +12,6 @@ define(['jquery','underscore','backbone',
 				
 			},
 			showNotification : function (data){
-				console.log(data)
 				var status = data["status"] || "info";
 				var classes = ["alert"];
 				switch (status){
@@ -30,7 +29,6 @@ define(['jquery','underscore','backbone',
 					break;
 				};
 				var cssClasses  = classes.join(" ");
-				console.log(cssClasses)
 				var el  = $("#notification")
 				el.removeClass().html("")
 				el.addClass(cssClasses).html(data["message"]);

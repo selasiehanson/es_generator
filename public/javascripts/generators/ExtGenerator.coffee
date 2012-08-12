@@ -194,35 +194,51 @@ define ["jquery", "underscore","modules/helper",'modules/mediator'], ($,_,helper
 						success : false
 		result
 	ExtGen.process = () ->
-
+		@results = []
 		@createModel()
 		@createStore()
 		@createEditView()
-		@createGridView()
+		@createGridView() 
 		@createController()
-		return @
+		
+		console.log(@results)
+		#loop througth the results and report error messages
+
+		error = "Error were encountered in creating the following outputs"
+		hasErrors = false
+		for result in @results
+			if result["status"] is false
+				hasErrors = true
+				error += " " + result["type"]
+		if not hasErrors
+			error = "File compiled successfully" 
+
+		info =
+			message : error
+			status : hasErrors
+		mediator.publish("app_notify",info)
+		@
+
 	ExtGen.createModel = () ->
 		data =  @mvcs.model
 		@getTemplate(
 			file : 'model.js'
 			folder : 'ExtJs'
 		, data,"model")
-		return
+		
 	ExtGen.createStore = () ->
 		data =  @mvcs.store
 		@getTemplate(
 			file : 'store.js'
 			folder : 'ExtJs'
 		, data,"store")
-		return
-
+		
 	ExtGen.createEditView = () ->
 		data =  @mvcs.editView
 		@getTemplate(
 			file : 'edit.js'
 			folder : 'ExtJs'
 		, data,"editView")
-		return
 
 	ExtGen.createGridView = () ->
 		data =  @mvcs.gridView
@@ -230,7 +246,6 @@ define ["jquery", "underscore","modules/helper",'modules/mediator'], ($,_,helper
 			file : 'grid.js'
 			folder : 'ExtJs'
 		, data,"gridView")
-		return
 
 	ExtGen.createController = () ->
 		data = @mvcs.controller
@@ -238,11 +253,17 @@ define ["jquery", "underscore","modules/helper",'modules/mediator'], ($,_,helper
 			file : 'controller.js'
 			folder : 'ExtJs'
 		, data,"controller")
-		return
 
 	ExtGen.templateTize = (src,data,type) ->
 		func = _.template(src)
-		out = func(data)
+		try
+			out = func(data)
+		catch error
+			info = 
+				message : error.toString()
+				status : "error"
+			mediator.publish("app_notify", info)
+			return
 			
 		switch type
 			when "model" then @outCode.model = out
@@ -252,6 +273,11 @@ define ["jquery", "underscore","modules/helper",'modules/mediator'], ($,_,helper
 			when "controller"  then @outCode.controller = out
 
 		console.log @outCode
+		result =
+			success : true,
+			type : type
+
+		@results.push(result)
 		# console.log out
 
 	ExtGen.getTemplate = (info, input,type) ->

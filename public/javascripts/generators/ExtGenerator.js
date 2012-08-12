@@ -226,17 +226,38 @@
       return result;
     };
     ExtGen.process = function() {
+      var error, hasErrors, info, result, _i, _len, _ref;
+      this.results = [];
       this.createModel();
       this.createStore();
       this.createEditView();
       this.createGridView();
       this.createController();
+      console.log(this.results);
+      error = "Error were encountered in creating the following outputs";
+      hasErrors = false;
+      _ref = this.results;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        result = _ref[_i];
+        if (result["status"] === false) {
+          hasErrors = true;
+          error += " " + result["type"];
+        }
+      }
+      if (!hasErrors) {
+        error = "File compiled successfully";
+      }
+      info = {
+        message: error,
+        status: hasErrors
+      };
+      mediator.publish("app_notify", info);
       return this;
     };
     ExtGen.createModel = function() {
       var data;
       data = this.mvcs.model;
-      this.getTemplate({
+      return this.getTemplate({
         file: 'model.js',
         folder: 'ExtJs'
       }, data, "model");
@@ -244,7 +265,7 @@
     ExtGen.createStore = function() {
       var data;
       data = this.mvcs.store;
-      this.getTemplate({
+      return this.getTemplate({
         file: 'store.js',
         folder: 'ExtJs'
       }, data, "store");
@@ -252,7 +273,7 @@
     ExtGen.createEditView = function() {
       var data;
       data = this.mvcs.editView;
-      this.getTemplate({
+      return this.getTemplate({
         file: 'edit.js',
         folder: 'ExtJs'
       }, data, "editView");
@@ -260,7 +281,7 @@
     ExtGen.createGridView = function() {
       var data;
       data = this.mvcs.gridView;
-      this.getTemplate({
+      return this.getTemplate({
         file: 'grid.js',
         folder: 'ExtJs'
       }, data, "gridView");
@@ -268,15 +289,24 @@
     ExtGen.createController = function() {
       var data;
       data = this.mvcs.controller;
-      this.getTemplate({
+      return this.getTemplate({
         file: 'controller.js',
         folder: 'ExtJs'
       }, data, "controller");
     };
     ExtGen.templateTize = function(src, data, type) {
-      var func, out;
+      var func, info, out, result;
       func = _.template(src);
-      out = func(data);
+      try {
+        out = func(data);
+      } catch (error) {
+        info = {
+          message: error.toString(),
+          status: "error"
+        };
+        mediator.publish("app_notify", info);
+        return;
+      }
       switch (type) {
         case "model":
           this.outCode.model = out;
@@ -293,7 +323,12 @@
         case "controller":
           this.outCode.controller = out;
       }
-      return console.log(this.outCode);
+      console.log(this.outCode);
+      result = {
+        success: true,
+        type: type
+      };
+      return this.results.push(result);
     };
     ExtGen.getTemplate = function(info, input, type) {
       var _this = this;

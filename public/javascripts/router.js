@@ -10,7 +10,6 @@ define([
 		},
 		initialize :function (){
 			Backbone.history.start();
-			console.log("router started")
 			return this;
 		},
 		getFile : function (path){
@@ -25,7 +24,6 @@ define([
 				attr = _.extend(attr,
 					{content : res.data[0]
 				})
-				console.log(attr)
 				mediator.publish("fileRecieved",attr);
 			});
 		}

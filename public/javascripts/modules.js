@@ -24,7 +24,6 @@ define(['modules/facade','views/createFile',
 		});
 
 		facade.subscribe("initCreateFile", function (context, obj){
-			console.log("Create File called");
 			var fileView =  new FileView({
 					path: 'input',
 					type : 'model'
@@ -51,7 +50,7 @@ define(['modules/facade','views/createFile',
 				type : 'get',
 				success : function (res){
 					mediator.publish("projectOpening", res.data[0]);
-					var info = {message : data["message"], status : "success" };
+					var info = {message : res["message"], status : "success" };
 					mediator.publish("app_notify", info);
 				}
 			});
@@ -74,8 +73,8 @@ define(['modules/facade','views/createFile',
 			var content = [];
 			var _counter = 0;
 			var result = processDirs(content,data.folders,_counter);
-			window.result = result;
-			window.content = content
+			// window.result = result;
+			// window.content = content
 			window.datax = data
 			// path : settings.currentProject + "/" + folderName + "/" + file
 	
@@ -84,7 +83,6 @@ define(['modules/facade','views/createFile',
 		});
 
 		facade.subscribe("projectOpeningFinished",function(data){
-			console.log("project opening finished")
 			var message = data["projectName"] +" Opened successfully."
 			var info = {message : message, status : "success" };
 			mediator.publish("app_notify", info);
@@ -154,7 +152,7 @@ define(['modules/facade','views/createFile',
 		});
 
 		facade.subscribe("fileCreated",function (data){
-			console.log("file details obtained");
+			mediator.publish("app_notify",{message : "file created successfully"})
 		});
 
 
@@ -187,7 +185,7 @@ define(['modules/facade','views/createFile',
 					
 					file.save({}, {
 						success: function (response){
-							console.log(response);
+							mediator.publish("app_notify",{message : response["message"]})
 						}
 					});
 				} else {
@@ -210,7 +208,7 @@ define(['modules/facade','views/createFile',
 			}
 
 			$.get('/file',attr,function(res){
-				console.log(res)
+				
 				if (!res.success){
 					var info = {message : "File not found" , status : "error"}
 					mediator.publish("app_notify",info);
