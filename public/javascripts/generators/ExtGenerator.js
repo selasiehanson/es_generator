@@ -4,8 +4,9 @@
   define(["jquery", "underscore", "modules/helper", 'modules/mediator'], function($, _, helper, mediator) {
     var ExtGen;
     ExtGen = {};
-    ExtGen.init = function(code, configuration) {
+    ExtGen.init = function(code, configuration, fileInfo) {
       var config, editViewFields, gridViewFields, info, item, modelFields, name, names, namespace, output, raw, ref, references, result, somevar, _fields, _label, _name;
+      this.fileInfo = fileInfo;
       this.outCode = {
         model: "",
         store: "",
@@ -148,7 +149,8 @@
           model: {
             namespace: namespace,
             entityName: raw.entity,
-            fields: modelFields
+            fields: modelFields,
+            storeName: raw.entity + 's'
           },
           store: {
             namespace: namespace,
@@ -226,33 +228,45 @@
       return result;
     };
     ExtGen.process = function() {
-      var error, hasErrors, info, result, _i, _len, _ref;
       this.results = [];
       this.createModel();
       this.createStore();
       this.createEditView();
       this.createGridView();
-      this.createController();
-      console.log(this.results);
-      error = "Error were encountered in creating the following outputs";
-      hasErrors = false;
-      _ref = this.results;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        result = _ref[_i];
-        if (result["status"] === false) {
-          hasErrors = true;
-          error += " " + result["type"];
+      return this.createController();
+    };
+    ExtGen.checkErrors = function(callback) {
+      var check, waiting,
+        _this = this;
+      check = function() {
+        var hasErrors, info, message, result, _i, _len, _ref;
+        if (_this.results.length === 5) {
+          message = "Error were encountered in creating the following outputs";
+          hasErrors = false;
+          _ref = _this.results;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            result = _ref[_i];
+            if (result["status"] === false) {
+              hasErrors = true;
+              message += " " + result["type"];
+            }
+          }
+          if (!hasErrors) {
+            message = "File compiled successfully";
+          }
+          info = {
+            message: message,
+            status: hasErrors
+          };
+          clearInterval(waiting);
+          mediator.publish("app_notify", info);
+          mediator.publish("compilationSuccessFull", _this.fileInfo);
+          if (callback) {
+            return callback();
+          }
         }
-      }
-      if (!hasErrors) {
-        error = "File compiled successfully";
-      }
-      info = {
-        message: error,
-        status: hasErrors
       };
-      mediator.publish("app_notify", info);
-      return this;
+      return waiting = setInterval(check, 500);
     };
     ExtGen.createModel = function() {
       var data;
@@ -323,21 +337,27 @@
         case "controller":
           this.outCode.controller = out;
       }
-      console.log(this.outCode);
       result = {
         success: true,
         type: type
       };
       return this.results.push(result);
     };
-    ExtGen.getTemplate = function(info, input, type) {
+    ExtGen.getTemplate = function(info, input, type, callback) {
       var _this = this;
       $.get('/template', info, function(res) {
         _this.templateTize(res["data"], input, type);
+        if (callback) {
+          callback();
+        }
       });
     };
     ExtGen.saveCode = function() {
+      window.out = this.outCode;
       return console.log(this.outCode);
+    };
+    ExtGen.getOutput = function() {
+      return this.outCode;
     };
     return ExtGen;
   });

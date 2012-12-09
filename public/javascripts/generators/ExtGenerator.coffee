@@ -1,7 +1,8 @@
 define ["jquery", "underscore","modules/helper",'modules/mediator'], ($,_,helper,mediator) ->
 	ExtGen = {}
 	
-	ExtGen.init = (code, configuration) ->
+	ExtGen.init = (code, configuration,fileInfo) ->
+		@fileInfo = fileInfo
 		@outCode = 
 			model : ""
 			store : ""
@@ -137,6 +138,7 @@ define ["jquery", "underscore","modules/helper",'modules/mediator'], ($,_,helper
 					namespace : namespace
 					entityName : raw.entity
 					fields : modelFields
+					storeName : raw.entity + 's'
 				store :
 					namespace : namespace
 					storeName : raw.entity + 's'
@@ -200,24 +202,36 @@ define ["jquery", "underscore","modules/helper",'modules/mediator'], ($,_,helper
 		@createEditView()
 		@createGridView() 
 		@createController()
+	
+	ExtGen.checkErrors  = (callback) ->
+		check = () =>
+			if @results.length == 5
+				#loop througth the results and report error messages
+				message = "Error were encountered in creating the following outputs"
+				hasErrors = false
+
+				for result in @results
+					if result["status"] is false
+						hasErrors = true
+						message += " " + result["type"]
+
+				if not hasErrors
+					message = "File compiled successfully" 
+
+				info =
+					message : message
+					status : hasErrors
+					
+				clearInterval(waiting)
+				mediator.publish("app_notify",info)
+				mediator.publish("compilationSuccessFull",@fileInfo)
+				
+				if callback
+					callback()
+
+		waiting = setInterval(check,500)
 		
-		console.log(@results)
-		#loop througth the results and report error messages
 
-		error = "Error were encountered in creating the following outputs"
-		hasErrors = false
-		for result in @results
-			if result["status"] is false
-				hasErrors = true
-				error += " " + result["type"]
-		if not hasErrors
-			error = "File compiled successfully" 
-
-		info =
-			message : error
-			status : hasErrors
-		mediator.publish("app_notify",info)
-		@
 
 	ExtGen.createModel = () ->
 		data =  @mvcs.model
@@ -272,7 +286,6 @@ define ["jquery", "underscore","modules/helper",'modules/mediator'], ($,_,helper
 			when "gridView" then @outCode.gridView = out
 			when "controller"  then @outCode.controller = out
 
-		console.log @outCode
 		result =
 			success : true,
 			type : type
@@ -280,13 +293,19 @@ define ["jquery", "underscore","modules/helper",'modules/mediator'], ($,_,helper
 		@results.push(result)
 		# console.log out
 
-	ExtGen.getTemplate = (info, input,type) ->
+	ExtGen.getTemplate = (info, input,type,callback) ->
 		
 		$.get '/template', info, (res)=>
 			@templateTize(res["data"],input,type)
+			if callback
+				callback()
 			return
 		return
 	ExtGen.saveCode = () ->
+		window.out = @outCode
 		console.log @outCode
+
+	ExtGen.getOutput = () ->
+		@outCode
 
 	return ExtGen;

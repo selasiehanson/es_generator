@@ -134,7 +134,10 @@ exports.createFile =  function  (req, res){
 			fs.writeFile(file,content,function (err){
 				
 				if(!err){
-					message = "file successfully created";
+					if ( mode==='new')
+						message = "File "+fileName+" successfully created";
+					else
+						message = "File "+fileName+"  successfully updated."
 					success =  true;
 					
 					var d = {
@@ -142,13 +145,6 @@ exports.createFile =  function  (req, res){
 					}
 
 					res.send({success : success, message : message , data : [d]});
-					// getFolderContents(d, function (output){
-					// 	var data = {
-					// 		projectName : project,
-					// 		folders : output
-					// 	}
-					// 	res.send({success : success, message : message , data : [data]});
-					// });
 
 				}else {
 					console.log(err);
@@ -162,7 +158,7 @@ exports.getFile = function (req, res){
 	var file = req.query.path;
 	
 	if(file){
-		var path =projectFolder + file;
+		var path = projectFolder + file;
 		fs.readFile(path, 'utf8', function(err, data){
 			if(err)
 				res.send({success : false, message : "there was an error", error : err.toString()});

@@ -39,11 +39,20 @@ define(['jquery','underscore','backbone','codemirror',
 			saveFile : function (){
 				//todo: enable CTRL + S for file saving
 				var currentCode = this.editor.getValue();
-				mediator.publish("pushFileToSave", currentCode);
+				mediator.publish("pushCurrentFileToSave", currentCode);
 			},
 			runFile : function () {
+
 				var currentCode =  this.editor.getValue();
-				mediator.publish("pushFileToRun", currentCode);
+
+				var data = {
+					code  : currentCode,
+					fileInfo :{
+						name : this.file.name	
+					} 
+				};
+
+				mediator.publish("pushFileToRun", data);
 			}
 		});
 

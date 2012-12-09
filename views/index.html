@@ -32,14 +32,7 @@
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="stylesheets/assets/ico/apple-touch-icon-72-precomposed.png">
     <link rel="apple-touch-icon-precomposed" href="stylesheets/assets/ico/apple-touch-icon-57-precomposed.png">
 
-    <script type="text/template" id="template_opt">
-      	<optgroup label='<%= folder%>'>
-	  		<% for (var i=0; i < files.length; i++){%>
-	  			<option><%= files[i]%></option>
-	  		<% } %>
-	  		
-	  	</optgroup>
-  	</script>
+    
     <!-- My custom CSS -->
     <link rel="stylesheet" href="stylesheets/style.css"> 
 </head>
@@ -63,8 +56,6 @@
               </div>
           </div>
       </div>
-     
-     
   </div>
   <div class="center">
       <div class='subnav subnav-fixed mytoolbar'>
@@ -114,8 +105,6 @@
             </a>
           </li>
         </ul>
-        
-        
       </div><!--toolbar-->
      
         <div class="">
@@ -123,34 +112,7 @@
             <textarea id="templateTA"></textarea>
           </div>
       
-          <div class="modal hide " id="myModal">
-              <div class="modal-header">
-                <a class="close" data-dismiss="modal">×</a>
-                <h3>Create Project</h3>
-              </div>
-              <div class="modal-body ">
-                <form class='form-horizontal'>
-                  <div class="control-group">
-                    <label class='control-label es_label'>Title: </label>
-                    <div class='controls es_control'>
-                      <input type='text' name='projectName' id='projectName' class='es_input'>
-                    </div>
-                  </div>
-                  <label class='control-label es_label'>Project Type: </label>
-                  <div class='controls es_control'>
-                    <select name='projectType' id='projectType' class='es_combo'>
-                      <option value='extjs'>ExtJs </option>
-                      <option value='twitterbootstrap'>Twitter Boostrap </option>
-                    </select>
-                  </div>
-                </form>
-                
-              </div>
-              <div class="modal-footer">
-                <a href="#" id='btn_project_create' class="btn btn-primary">Create</a>
-                <a href="#"  data-dismiss="modal" class="btn btn-primary">Cancel</a>
-              </div>
-          </div>
+         
         </div> <!-- /container -->
     </div>
 

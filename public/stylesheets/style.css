@@ -43,8 +43,10 @@ a {
 
 .editorArea .CodeMirror-scroll {
 	height: 700px;
-	width : 80%;
-	/*position: fixed;*/
+	/*overflow: scroll;*/
+	position: absolute;
+	right: 0;
+	left: 0;
 }
 
 .subnav {
@@ -124,6 +126,7 @@ a {
     font-weight: bold;
     margin-bottom: 10px;
     padding: 10px;
+    width: 250px;
 }
 
 .cust-tree a {

@@ -25,14 +25,14 @@ define(['modules/facade','views/createFile',
 
 		facade.subscribe("initCreateFile", function (context, obj){
 			var fileView =  new FileView({
-					path: 'input',
-					type : 'model'
+				path: 'input',
+				type : 'model'
 			});
 		});
 
-		facade.subscribe("initNewProject",function (context){
-			var projectView =  new ProjectView;
-		})
+		// facade.subscribe("initNewProject",function (context){
+		// 	var projectView =  new ProjectView;
+		// })
 		
 
 		// facade.subscribe("initOpenProject", function(context){
@@ -73,9 +73,8 @@ define(['modules/facade','views/createFile',
 			var content = [];
 			var _counter = 0;
 			var result = processDirs(content,data.folders,_counter);
-			// window.result = result;
-			// window.content = content
-			window.datax = data
+			//window.content = content
+			//window.datax = data
 			// path : settings.currentProject + "/" + folderName + "/" + file
 	
 			out["dirs"] = content;
@@ -96,7 +95,7 @@ define(['modules/facade','views/createFile',
 		        if (!_.isArray(objectMap[prop])) {
 		        	var parent;
 		        	counter++;
-		        	var newPath  = _path +"/" +prop ;
+		        	var newPath  = _path + "/" +prop ;
 		        	var items = processDirs(out,objectMap[prop],counter,newPath);
 		        	counter--;
 			        
@@ -168,8 +167,7 @@ define(['modules/facade','views/createFile',
 
 		});
 
-		facade.subscribe("pushFileToSave", function (code){
-			
+		facade.subscribe('pushCurrentFileToSave',function (code){
 			if(settings.solutionOpened ){
 				if(!_.isEmpty(settings.currentFile)){
 					var currentFile =  settings.currentFile
@@ -185,7 +183,9 @@ define(['modules/facade','views/createFile',
 					
 					file.save({}, {
 						success: function (response){
-							mediator.publish("app_notify",{message : response["message"]})
+
+							var info = {message : response.get("message"), status : "success"}
+							mediator.publish("app_notify",info);
 						}
 					});
 				} else {
@@ -199,8 +199,71 @@ define(['modules/facade','views/createFile',
 			}
 		});
 
+		facade.subscribe("compilationSuccessFull", function (fileInfo){
+			console.log(fileInfo)
+			mediator.publish("app_notify",{message:"Saving Compilation"});
+			var output = _gen.getOutput();
+			
+			var paths = {
+				model : { path : "app/model/", name : fileInfo.name},
+				controller : { path : "app/controller/", name : fileInfo.name},
+				store : { path : "app/store/", name : fileInfo.name},
+				editView : { path : "app/view/", name : "Edit.js"},
+				gridView : { path : "app/view/", name : "List.js"}
+			}
+			
+			var file = null;
+			var count = 0;
+			var responses = [];
+			for(var i in output){
+				var fileProps = {
+					project : settings.currentProject,
+					path : settings.helpers.fixFilePaths(settings.currentProject ,"output/ExtJs/" + paths[i]["path"] , paths[i]["name"]),
+					name :paths[i]["name"],
+					mode : 'update',
+					content : output[i]
+				}
 
-		facade.subscribe('pushFileToRun', function (code){
+				file = new File(fileProps);
+				count++;
+				file.save({}, {
+					success: function (response){
+						responses.push(response);
+						
+					}
+				});
+			}
+
+			var savingErrorCheker  = function (){
+				var errors = [];
+				if(responses.length ===  count){
+					for(var i=0; i < count; i++){
+						window.xx = responses[i];
+						if(!responses[i].get("success")){
+							errors.push(responses[i].get("message"));
+						}
+					}
+
+					if(errors.length > 0){
+						var info = { message : errors.join(" ") , status :"error"}
+						mediator.publish("app_notify",info);
+						mediator.publish("saveAfterCompilation", settings.currentProject);
+					}else {
+						var info = { message : "Saving on Compilation Successfull" }
+						mediator.publish("app_notify",info);
+					}
+					clearInterval(checker);	
+				}
+
+				
+			}
+			var checker = setInterval(savingErrorCheker,200);
+		});
+
+		facade.subscribe("saveAfterCompilation", function  (projectName) {
+			facade.publish("openProject", projectName)
+		})
+		facade.subscribe('pushFileToRun', function (data){
 			//todo
 			//get the config file
 			var attr = {
@@ -214,14 +277,17 @@ define(['modules/facade','views/createFile',
 					mediator.publish("app_notify",info);
 				}else {
 					var configuration = res["data"][0];
-					if( _gen.init(code,configuration)){
+					if( _gen.init(data["code"],configuration, data["fileInfo"])){
 						_gen.process();
-						_gen.saveCode();			
+						_gen.checkErrors();
+						//console.log(_gen.fileInfo);
 					}
 				}
 			});
 			
 		});
+
+			
 
 		facade.subscribe("app_notify", function (packet){
 			mediator.publish("notify",packet);

@@ -1,32 +1,40 @@
-define(['jquery','underscore','backbone','models/project',
+define(['jquery','underscore','backbone',
+	'text!../../templates/create_project.html',
+	'models/project',
 	"views/solution_pane","../modules/mediator"], 
-	function ($,_,Backbone,Project,SolutionPane,mediator){
+	function ($,_,Backbone,textTemplate, Project,SolutionPane,mediator){
 
 	var ProjectView = Backbone.View.extend({
-		el : "#myModal" ,
-
+		el : "body" ,
+		form : "#myModal",
+		template : _.template(textTemplate),
 		events : {
 			'click #btn_project_create' : 'createProject'
 		},
 		initialize : function (){
+			this.$el.append(this.template());
 			this.opened = false;
-			this.render();
 			this.input = $("#projectName");
 			this.projectType = $("#projectType");
 			var self =  this;
+			self.form = $(self.form);
+			
+			mediator.subscribe("initNewProject", function(){
+				self.render();
+			})
+
 			mediator.subscribe("projectOpeningFinished",function (){
 				console.log("project opening finished")
-				if(self.opened){
-					$(self.el).modal('hide');	
-					self.opened = false;
-				}
+				//if(self.opened){
+					self.form.modal('hide');	
+					//self.opened = false;
+				//}
 			})
 		},
 		render : function (){
-			$(this.el).modal();
+			this.form.modal("show");
 		},
 		closeView : function () {
-
 			
 		},
 		createProject : function (){

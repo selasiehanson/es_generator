@@ -1,6 +1,6 @@
 Ext.define("<%= namespace %>.store.<%= storeName %>",{
 	extend :'Ext.data.Store',
 	//autoLoad : true,
-	model :'QI.model.<%= entityName %>',
-	requires : 'QI.model.<%= entityName %>'
+	model :'<%= namespace %>.model.<%= entityName %>',
+	requires : '<%= namespace %>.model.<%= entityName %>'
 })

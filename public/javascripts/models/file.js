@@ -3,7 +3,7 @@ define(['backbone'],function (Backbone){
 		url : 'file',
 		defaults: {
 			content : '',
-			mode : 'new'
+			mode : 'new',
 		},
 		validate : function (attrs){
 			if(!attrs.name){

@@ -50,8 +50,6 @@ function test(){
   });
 }
 
-test()
-
 //Routes
 app.get('/', routes.index);
 app.get('/template', routes.getTemplate);
@@ -67,5 +65,5 @@ app.post('/project', projectRoute.updateProject);
 app.post('/file',projectRoute.createFile);
 app.get('/file',projectRoute.getFile);
 
-app.listen(3000);
+app.listen(process.env.PORT || 8080);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
