@@ -28,19 +28,11 @@ define(['modules/facade','views/createFile',
 				path: 'input',
 				type : 'model'
 			});
+
 		});
 
-		// facade.subscribe("initNewProject",function (context){
-		// 	var projectView =  new ProjectView;
-		// })
-		
-
-		// facade.subscribe("initOpenProject", function(context){
-		// 	//var openProjectView =  new OpenProjectView;
-		// 	//self.openProjectView.show();
-		// });
-
-		facade.subscribe("openProject", function (projectName){
+		facade.subscribe("openProject", function (projectName, freshLoad){
+			console.log(projectName)
 			$.ajax({
 				url : 'project',
 				data : {
@@ -51,7 +43,8 @@ define(['modules/facade','views/createFile',
 				success : function (res){
 					mediator.publish("projectOpening", res.data[0]);
 					var info = {message : res["message"], status : "success" };
-					mediator.publish("app_notify", info);
+					if(freshLoad)
+						mediator.publish("app_notify", info);
 				}
 			});
 		});
@@ -143,8 +136,9 @@ define(['modules/facade','views/createFile',
 			
 			file.save({},{
 				success : function (model , res){
-					mediator.publish("fileCreated",res); 
-					mediator.publish("openProject", res.data[0]["projectName"]);
+					mediator.publish("fileCreated",res);
+					if(context.type === "model" ) 
+					mediator.publish("openProject", settings.currentProject);
 					context.form.modal('hide');
 				}
 			});
@@ -200,7 +194,6 @@ define(['modules/facade','views/createFile',
 		});
 
 		facade.subscribe("compilationSuccessFull", function (fileInfo){
-			console.log(fileInfo)
 			mediator.publish("app_notify",{message:"Saving Compilation"});
 			var output = _gen.getOutput();
 			
@@ -229,7 +222,6 @@ define(['modules/facade','views/createFile',
 				file.save({}, {
 					success: function (response){
 						responses.push(response);
-						
 					}
 				});
 			}
@@ -247,10 +239,11 @@ define(['modules/facade','views/createFile',
 					if(errors.length > 0){
 						var info = { message : errors.join(" ") , status :"error"}
 						mediator.publish("app_notify",info);
-						mediator.publish("saveAfterCompilation", settings.currentProject);
+						
 					}else {
 						var info = { message : "Saving on Compilation Successfull" }
 						mediator.publish("app_notify",info);
+						mediator.publish("saveAfterCompilation", settings.currentProject);
 					}
 					clearInterval(checker);	
 				}
@@ -261,8 +254,10 @@ define(['modules/facade','views/createFile',
 		});
 
 		facade.subscribe("saveAfterCompilation", function  (projectName) {
-			facade.publish("openProject", projectName)
-		})
+			console.log(projectName)
+			mediator.publish("openProject", settings.currentProject);
+		});
+
 		facade.subscribe('pushFileToRun', function (data){
 			//todo
 			//get the config file

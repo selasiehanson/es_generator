@@ -41,7 +41,7 @@ define(['jquery','underscore','Backbone',
 			},
 			openProject : function (){
 				var projectName = this.input.val()
-				mediator.publish("openProject",projectName);
+				mediator.publish("openProject",projectName, true);
 			}
 
 

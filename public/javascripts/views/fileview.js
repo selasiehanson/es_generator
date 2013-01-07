@@ -9,7 +9,7 @@ define(['jquery','underscore','backbone',
 				"click .file" : "fileClicked"
 			},
 			initialize : function () {
-
+				
 			},
 			render : function (){
 				//console.log(this.model)
